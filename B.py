@@ -476,3 +476,29 @@ if Nb_from_A == Nb:
 else:
     print("Nb is not valid, youre not A")
     client_socket.close()
+
+    # ======================================= CONTINUE TO TALK WITH A ======================================
+
+while 1:
+    key_A = client_socket.recv(1024).decode()
+    print("key_A: ", key_A)
+    key_A = eval(key_A)
+    key_A = decrypt_rsa(key_A, d, n)
+    # receive chipertext
+    chipertext_from_A = client_socket.recv(1024).decode()
+    print("chipertext from A: ", chipertext_from_A)
+    type = "decrypt"
+    plaintext = key_exchange_A(key_A, chipertext_from_A, type)
+    print("plaintext from A: ", plaintext)
+
+    # send chipertext
+    plaintext = input("Please input plaintext: ")
+    if plaintext == "exit":
+        break
+    type = "encrypt"
+    chipertext = key_exchange_A(key_A, plaintext, type)
+    print("plaintext for A: ", plaintext)
+    print("chipertext for A: ", chipertext)
+    client_socket.send(chipertext.encode())
+    
+client_socket.close()

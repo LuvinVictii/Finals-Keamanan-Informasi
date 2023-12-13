@@ -418,9 +418,7 @@ if Na_from_B == Na:
     # =========================================  STEP 4 - TO B   ==============================================
     print("Let's Talks with B")
     send_key_A = encrypt_rsa(key_A, e_B, n_B)
-    # print("send_key_A sebelum str: ", send_key_A)
     send_key_A = str(send_key_A)
-    # print("send_key_A: ", send_key_A)
     
     client_socket.send(send_key_A.encode())
     
@@ -481,3 +479,29 @@ if Na_from_B == Na:
 else:
     print("Na is not valid, youre not A")
     client_socket.close()
+
+# =============================================  CONTINUE TALKS WITH B   =====================================
+while 1:
+    send_key_A = encrypt_rsa(key_A, e_B, n_B)
+    send_key_A = str(send_key_A)
+    
+    client_socket.send(send_key_A.encode())
+    
+    # DAFFA12345678910
+    plaintext = input("Please input plaintext:  ")
+    if (plaintext == "exit"):
+        break
+    type = "encrypt"
+    chipertext = key_exchange_A(key_A, plaintext, type)
+    print("plaintext for B: ", plaintext)
+    print("chipertext for B: ", chipertext)
+    client_socket.send(chipertext.encode())
+
+    # receive chipertext
+    chipertext_from_B = client_socket.recv(1024).decode()
+    print("chipertext from B: ", chipertext_from_B)
+    type = "decrypt"
+    plaintext = key_exchange_A(key_A, chipertext_from_B, type)
+    print("plaintext from B: ", plaintext)
+
+client_socket.close()
